@@ -47,7 +47,7 @@
     });
     baselayer.addTo(mymap);
 
-    var marker = L.marker([51.5, -0.09]).bindPopup('Text');
+    var marker = L.marker([51.5, -0.09]).bindPopup('Text').addTo(mymap);
 
 
 
@@ -69,7 +69,7 @@
             content = "Name: " + feature.properties.name + "<br>Amenity: " + feature.properties.amenity + "<br>Content: " + feature.properties.popupContent;
             layer.bindPopup(content);
         }
-    });
+    }).addTo(mymap);
     //myLayer.addData(geojsonFeature).bindPopup(geojsonFeature.properties.popupContent)
 
     L.control.layers({"Base": baselayer},{"Point": marker, "GeoJSON-ting": myLayer}, {collapsed: false}).addTo(mymap);
