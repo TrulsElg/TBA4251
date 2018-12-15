@@ -28,7 +28,7 @@
         accessToken: 'pk.eyJ1IjoidHJ1bHNlbGciLCJhIjoiY2pjd2ZkendyMWFlMzJxbnV1NG85M3R5dCJ9.MWVoCtm9_o9MYosQqVMK6w'
     }).addTo(mymap);
 
-    var marker = L.marker([51.5, -0.09]).addTo(mymap);
+    var marker = L.marker([51.5, -0.09]).bindPopup('Text').addTo(mymap);
 
 
 
@@ -46,7 +46,7 @@
     };
 
     var myLayer = L.geoJSON().addTo(mymap)
-    myLayer.addData(geojsonFeature)
+    myLayer.addData(geojsonFeature).bindPopup(geojsonFeature.properties.popupContent)
 
     var myLines = [{
         "type": "LineString",
@@ -56,7 +56,7 @@
         "coordinates": [[-0.1, 51.49], [-0.09, 51.52], [-0.1, 51.53]]
     }];
 
-    myLayer.addData(myLines)
+    myLayer.addData(myLines).bindPopup('Lines!')
 
     </script>
 
