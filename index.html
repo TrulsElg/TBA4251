@@ -47,6 +47,11 @@
     });
     baselayer.addTo(mymap);
 
+    var base = L.tileLayer('', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18
+       });
+
     var marker = L.marker([51.5, -0.09]).bindPopup('Text').addTo(mymap);
 
     var geojsonFeature = {
@@ -70,7 +75,7 @@
     }).addTo(mymap);
     //myLayer.addData(geojsonFeature).bindPopup(geojsonFeature.properties.popupContent)
 
-    L.control.layers({"Base": baselayer},{"Point": marker, "GeoJSON-ting": myLayer}, {collapsed: false}).addTo(mymap);
+    L.control.layers({"Base": baselayer, "Blankt": base},{"Point": marker, "GeoJSON-ting": myLayer}, {collapsed: false}).addTo(mymap);
 
     </script>
 
