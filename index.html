@@ -54,7 +54,8 @@
        });
 
     var marker = L.marker([51.5, -0.09]).bindPopup('Text').addTo(mymap);
-    //var buffer = turf.buffer(marker.toGeoJSON(),0.5).addTo(mymap);
+    var buffer = turf.buffer(marker.toGeoJSON(), (4*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
+    var bufferLayer = L.geoJSON(buffer).bindPopup('Area:'+turf.area(buffer)/1000000).addTo(mymap);
 
     var geojsonFeature = {
         "type": "Feature",
@@ -75,7 +76,6 @@
             layer.bindPopup(content);
         }
     }).addTo(mymap);
-    //myLayer.addData(geojsonFeature).bindPopup(geojsonFeature.properties.popupContent)
 
     var bases = {
         "Base": baselayer,
@@ -84,10 +84,11 @@
 
     var overlays = {
         "Point": marker,
-        "GeoJSON-ting": myLayer
+        "GeoJSON-ting": myLayer,
+        "Buffer layer": bufferLayer
     };
 
-    L.control.layers(bases,{"Point": marker, "GeoJSON-ting": myLayer}, {collapsed: false}).addTo(mymap);
+    L.control.layers(bases, overlays, {collapsed: false}).addTo(mymap);
 
     </script>
 
