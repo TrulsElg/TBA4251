@@ -1,0 +1,9 @@
+Ting å huske på:
+
+Ting som kan sammenlignes(ting 1, ting 2, ting 3, etc.):
+Turf, JSTS
+Leaflet, andre lignende verktøy
+
+
+Mulige problemer(problem. hvorfor):
+TurfBuffer. Ikke riktig størrelse, konsekvent for liten buffer(areal), visstnok noe feil med kartprojeksjonen, bruker transversal mercator elns
