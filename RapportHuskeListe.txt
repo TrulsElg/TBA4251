@@ -13,3 +13,4 @@ TurfBuffer. Ikke riktig størrelse, konsekvent for liten buffer(areal), visstnok
 
 Ting å fikse:
 Linker sentrert, om mulig ikke det viktigste
+Faktor i buffer. sjekk opp mot verdien av pi

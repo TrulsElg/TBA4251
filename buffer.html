@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Project - TBA4251</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==" crossorigin=""></script>
+    <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+
+    <style>
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Add a black background color to the top navigation */
+        .topnav {
+            background-color: #333;
+            overflow: hidden;
+            height: 5%;
+        }
+
+        /* Style the links inside the navigation bar */
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        /* Change the color of links on hover */
+        .topnav a:hover {
+          background-color: #ddd;
+          color: black;
+        }
+
+        /* Add a color to the active/current link */
+        .topnav a.active {
+          background-color: #4CAF50;
+          color: white;
+        }
+
+        .content {
+            display: inline-block;
+            height: 95%;
+            width: 15%;
+            background-color: #ccc;
+        }
+
+        #mapid {
+            height: 95%;
+            width: 85%;
+            float: left;
+        }
+
+        .map {
+            height: 99vh;
+            width: 80%;
+            float: left;
+        }
+
+        .functions {
+            background-color: azure;
+            height: 99vh;
+            width: 20%;
+            float: left;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="topnav">
+        <a href="index.html">Start/Intro</a>
+        <a class="active">Buffer</a>
+        <a href="intersect.html">Nav1</a>
+    </div>
+
+    <div id="mapid" ></div>
+
+
+    <div class="content">
+        <div>
+
+        </div>
+        <h2>Functions coming soon!</h2>
+
+        <div style="margin: 10px">
+            <p style="padding:0; margin:0; display: inline-block">Layer: </p>
+            <select id="selectLayer" style="width: 60%"></select><br>
+            <p style="padding:0; margin:0; display: inline-block">Buffer length: </p>
+            <input id="bufferLength" style="width: 20%" type="number" min="0" step="0.0001" placeholder="Kilometer(s)"><br>
+            <button onclick="bufferFunction()">Create buffer</button><br>
+        </div>
+
+    </div>
+
+    <script>
+
+    // initialize the map
+    var mymap = L.map('mapid', {zoomControl: false, attributionControl: false, zoomSnap: 0.5}).setView([51.505, -0.09], 13);
+
+     // load a tile layer
+    var baselayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox.streets',
+        accessToken: 'pk.eyJ1IjoidHJ1bHNlbGciLCJhIjoiY2pjd2ZkendyMWFlMzJxbnV1NG85M3R5dCJ9.MWVoCtm9_o9MYosQqVMK6w'
+    });
+    baselayer.addTo(mymap);
+
+    var base = L.tileLayer('', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18
+    });
+
+    var marker = L.marker([51.5, -0.09]).bindPopup('Text').addTo(mymap);
+    var buffer = turf.buffer(marker.toGeoJSON(), (2*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
+    var bufferLayer = L.geoJSON(buffer).bindPopup('Area:'+(turf.area(buffer)/1000000)+" km^2").addTo(mymap);
+
+    var geojsonFeature = {
+        "type": "Feature",
+        "properties": {
+            "name": "Arbitrary point",
+            "amenity": "Testing",
+            "popupContent": "This is a point!"
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [-0.1, 51.51]
+        }
+    };
+
+    var myLayer = L.geoJSON(geojsonFeature, {
+        onEachFeature: function (feature, layer) {
+            content = "Name: " + feature.properties.name + "<br>Amenity: " + feature.properties.amenity + "<br>Content: " + feature.properties.popupContent;
+            layer.bindPopup(content);
+        }
+    }).addTo(mymap);
+
+    var bases = {
+        "Base": baselayer,
+        "Blankt": base
+    };
+
+    var overlays = {
+        "Point": marker,
+        "GeoJSON-ting": myLayer,
+        "Buffer layer": bufferLayer
+    };
+
+    // Control for showing layers
+    var layerControl = L.control.layers(bases, overlays, {collapsed: false}).addTo(mymap);
+    L.control.scale({imperial: false, position: 'bottomright'}).addTo(mymap);
+    L.control.zoom({position: 'bottomright'}).addTo(mymap);
+
+
+    // Populate select-list with active layers
+    var selectLayer = document.getElementById("selectLayer") // Gets the list
+    var layerArray = Object.getOwnPropertyNames(overlays); // Get the names of the layers, as per overlays-object. Use these as reference
+    for (i=0; i<layerArray.length; i++){
+        selectLayer.options[selectLayer.options.length] = new Option(layerArray[i], layerArray[i]);
+    }
+
+
+
+    function bufferFunction(){
+        // Gets the selected layer
+        var e = document.getElementById("selectLayer");
+        var strLayer = e.options[e.selectedIndex].value;
+        var numberInput = document.getElementById("bufferLength").value;
+
+        if (!(numberInput == "" || numberInput == null)) {
+            var newBuffer = turf.buffer(overlays[strLayer].toGeoJSON(), (numberInput*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
+            var newBufferLayer = L.geoJSON(newBuffer).bindPopup('Area:'+(turf.area(newBuffer)/1000000)+" km^2").addTo(mymap);
+            var newBufferString = "" + strLayer +"_Buffer_"+numberInput;
+            layerControl.addOverlay(newBufferLayer, newBufferString);
+
+
+            overlays[newBufferString] = newBufferLayer;
+            selectLayer.options[selectLayer.options.length] = new Option(newBufferString, newBufferString);
+        }
+
+
+/*
+        var geoBuffer = turf.buffer(geojsonFeature, (3*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
+        var geoBufferLayer = L.geoJSON(geoBuffer).bindPopup('Area:'+turf.area(geoBuffer)/1000000).addTo(mymap);
+        layerControl.addOverlay(geoBufferLayer, "geoJSON buffer");
+
+        var newBuff = turf.buffer(overlays["Point"].toGeoJSON(), (3*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
+        var newBuffLayer = L.geoJSON(newBuff).bindPopup('Area:'+turf.area(newBuff)/1000000).addTo(mymap);
+        layerControl.addOverlay(newBuffLayer, "New Buffer, "+Object.getOwnPropertyNames(overlays)[0]);
+        */
+    }
+
+    </script>
+
+</body>
+</html>
