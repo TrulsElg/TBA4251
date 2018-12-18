@@ -93,7 +93,7 @@
             <p style="padding:0; margin:0; display: inline-block">Layer: </p>
             <select id="selectLayer" style="width: 60%"></select><br>
             <p style="padding:0; margin:0; display: inline-block">Buffer length: </p>
-            <input id="bufferLength" style="width: 20%" type="number" min="0" step="0.001" placeholder="Meter"><br>
+            <input id="bufferLength" style="width: 20%" type="number" min="0" step="0.0001" placeholder="Kilometer(s)"><br>
             <button onclick="bufferFunction()">Create buffer</button><br>
         </div>
 
@@ -120,7 +120,7 @@
 
     var marker = L.marker([51.5, -0.09]).bindPopup('Text').addTo(mymap);
     var buffer = turf.buffer(marker.toGeoJSON(), (2*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
-    var bufferLayer = L.geoJSON(buffer).bindPopup('Area:'+turf.area(buffer)/1000000).addTo(mymap);
+    var bufferLayer = L.geoJSON(buffer).bindPopup('Area:'+(turf.area(buffer)/1000000)+" km^2").addTo(mymap);
 
     var geojsonFeature = {
         "type": "Feature",
@@ -175,8 +175,8 @@
         var numberInput = document.getElementById("bufferLength").value;
 
         if (!(numberInput == "" || numberInput == null)) {
-            var newBuffer = turf.buffer(overlays[strLayer].toGeoJSON(), (numberInput*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'meters', steps: 1024});
-            var newBufferLayer = L.geoJSON(newBuffer).bindPopup('Area:'+turf.area(newBuffer)/1000000).addTo(mymap);
+            var newBuffer = turf.buffer(overlays[strLayer].toGeoJSON(), (numberInput*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
+            var newBufferLayer = L.geoJSON(newBuffer).bindPopup('Area:'+(turf.area(newBuffer)/1000000)+" km^2").addTo(mymap);
             var newBufferString = "" + strLayer +"_Buffer_"+numberInput;
             layerControl.addOverlay(newBufferLayer, newBufferString);
 
