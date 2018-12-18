@@ -46,16 +46,15 @@
         }
 
         .content {
-            text-align: center;
-            float: left;
+            display: inline-block;
             height: 95%;
-            width: 20%;
+            width: 15%;
             background-color: #ccc;
         }
 
         #mapid {
             height: 95%;
-            width: 80%;
+            width: 85%;
             float: left;
         }
 
@@ -83,8 +82,21 @@
 
     <div id="mapid" ></div>
 
+
     <div class="content">
+        <div>
+
+        </div>
         <h2>Functions coming soon!</h2>
+
+        <div style="margin: 10px">
+            <p style="padding:0; margin:0; display: inline-block">Layer: </p>
+            <select id="selectLayer" style="width: 60%"></select><br>
+            <p style="padding:0; margin:0; display: inline-block">Buffer length: </p>
+            <input id="bufferLength" style="width: 20%" type="number" min="0" step="0.001" placeholder="Meter"><br>
+            <button onclick="bufferFunction()">Create buffer</button><br>
+        </div>
+
     </div>
 
     <script>
@@ -107,7 +119,7 @@
     });
 
     var marker = L.marker([51.5, -0.09]).bindPopup('Text').addTo(mymap);
-    var buffer = turf.buffer(marker.toGeoJSON(), (4*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
+    var buffer = turf.buffer(marker.toGeoJSON(), (2*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
     var bufferLayer = L.geoJSON(buffer).bindPopup('Area:'+turf.area(buffer)/1000000).addTo(mymap);
 
     var geojsonFeature = {
@@ -141,7 +153,47 @@
         "Buffer layer": bufferLayer
     };
 
-    L.control.layers(bases, overlays, {collapsed: false}).addTo(mymap);
+    var layerControl = L.control.layers(bases, overlays, {collapsed: false}).addTo(mymap);
+    L.control.scale({imperial: false}).addTo(mymap);
+
+
+    // Populate select-list with active layers
+    var selectLayer = document.getElementById("selectLayer") // Gets the list
+    var layerArray = Object.getOwnPropertyNames(overlays); // Get the names of the layers, as per overlays-object. Use these as reference
+    for (i=0; i<layerArray.length; i++){
+        selectLayer.options[selectLayer.options.length] = new Option(layerArray[i], layerArray[i]);
+    }
+
+
+
+    function bufferFunction(){
+        // Gets the selected layer
+        var e = document.getElementById("selectLayer");
+        var strLayer = e.options[e.selectedIndex].value;
+        var numberInput = document.getElementById("bufferLength").value;
+
+        if (!(numberInput == "" || numberInput == null)) {
+            var newBuffer = turf.buffer(overlays[strLayer].toGeoJSON(), (numberInput*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'meters', steps: 1024});
+            var newBufferLayer = L.geoJSON(newBuffer).bindPopup('Area:'+turf.area(newBuffer)/1000000).addTo(mymap);
+            var newBufferString = "" + strLayer +"_Buffer_"+numberInput;
+            layerControl.addOverlay(newBufferLayer, newBufferString);
+
+
+            overlays[newBufferString] = newBufferLayer;
+            selectLayer.options[selectLayer.options.length] = new Option(newBufferString, newBufferString);
+        }
+
+
+/*
+        var geoBuffer = turf.buffer(geojsonFeature, (3*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
+        var geoBufferLayer = L.geoJSON(geoBuffer).bindPopup('Area:'+turf.area(geoBuffer)/1000000).addTo(mymap);
+        layerControl.addOverlay(geoBufferLayer, "geoJSON buffer");
+
+        var newBuff = turf.buffer(overlays["Point"].toGeoJSON(), (3*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
+        var newBuffLayer = L.geoJSON(newBuff).bindPopup('Area:'+turf.area(newBuff)/1000000).addTo(mymap);
+        layerControl.addOverlay(newBuffLayer, "New Buffer, "+Object.getOwnPropertyNames(overlays)[0]);
+        */
+    }
 
     </script>
 
