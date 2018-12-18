@@ -102,7 +102,7 @@
     <script>
 
     // initialize the map
-    var mymap = L.map('mapid').setView([51.505, -0.09], 13);
+    var mymap = L.map('mapid', {zoomControl: false, attributionControl: false}).setView([51.505, -0.09], 13);
 
      // load a tile layer
     var baselayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -153,8 +153,10 @@
         "Buffer layer": bufferLayer
     };
 
+    // Control for showing layers
     var layerControl = L.control.layers(bases, overlays, {collapsed: false}).addTo(mymap);
-    L.control.scale({imperial: false}).addTo(mymap);
+    L.control.scale({imperial: false, position: 'bottomright'}).addTo(mymap);
+    L.control.zoom({position: 'bottomright'}).addTo(mymap);
 
 
     // Populate select-list with active layers
