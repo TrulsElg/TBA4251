@@ -81,6 +81,7 @@
         <a href="union.html">Union</a>
         <a href="intersect.html">Intersect</a>
         <a href="difference.html">Difference</a>
+        <a href="filter.html">Filter</a>
     </div>
 
     <div id="mapid" ></div>
@@ -138,6 +139,97 @@
         }
     };
 
+    var feature = {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [
+                        -0.11363983154296875,
+                        51.519104878455764
+                    ],
+                    [
+                        -0.13853073120117188,
+                        51.499980636437265
+                    ],
+                    [
+                        -0.06557464599609375,
+                        51.50233153463367
+                    ],
+                    [
+                        -0.0652313232421875,
+                        51.54131737835025
+                    ],
+                    [
+                        -0.13166427612304688,
+                        51.53843463708563
+                    ],
+                    [
+                        -0.11363983154296875,
+                        51.519104878455764
+                    ]
+                ],
+                [
+                    [
+                        -0.08462905883789061,
+                        51.529998900885644
+                    ],
+                    [
+                        -0.08617401123046874,
+                        51.52177522311313
+                    ],
+                    [
+                        -0.09424209594726562,
+                        51.52743583596879
+                    ],
+                    [
+                        -0.08462905883789061,
+                        51.529998900885644
+                    ]
+                ],
+                [
+                    [
+                        -0.05819320678710937,
+                        51.53512459785485
+                    ],
+                    [
+                        -0.05115509033203125,
+                        51.52166841233309
+                    ],
+                    [
+                        -0.07518768310546875,
+                        51.52775622697431
+                    ],
+                    [
+                        -0.05819320678710937,
+                        51.53512459785485
+                    ]
+                ],
+                [
+                    [
+                        -0.08754730224609375,
+                        51.52647464942479
+                    ],
+                    [
+                        -0.060939788818359375,
+                        51.52946494092692
+                    ],
+                    [
+                        -0.07844924926757812,
+                        51.53373644524688
+                    ],
+                    [
+                        -0.08754730224609375,
+                        51.52647464942479
+                    ]
+                ]
+            ]
+        }
+    };
+    var featureLayer = L.geoJSON(feature).bindPopup('Area:'+(turf.area(feature)/1000000)+" km^2").addTo(mymap);
+
     var myLayer = L.geoJSON(geojsonFeature, {
         onEachFeature: function (feature, layer) {
             content = "Name: " + feature.properties.name + "<br>Amenity: " + feature.properties.amenity + "<br>Content: " + feature.properties.popupContent;
@@ -153,7 +245,8 @@
     var overlays = {
         "Point": marker,
         "GeoJSON-ting": myLayer,
-        "Buffer layer": bufferLayer
+        "Buffer layer": bufferLayer,
+        "Funky": featureLayer
     };
 
     // Control for showing layers

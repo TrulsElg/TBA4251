@@ -66,6 +66,7 @@
         <a href="union.html">Union</a>
         <a class="active">Intersect</a>
         <a href="difference.html">Difference</a>
+        <a href="filter.html">Filter</a>
     </div>
 
     <div id="mapid"></div>
@@ -182,7 +183,7 @@
         var eB = document.getElementById("selectLayerB");
         var indexLayerB = eB.options[eB.selectedIndex].value;
 
-        if (!(indexLayerB==indexLayerA) && geoArray[indexLayerA].geometry.type=="Polygon" && geoArray[indexLayerB].geometry.type=="Polygon"){
+        if (!(indexLayerB===indexLayerA) && geoArray[indexLayerA].geometry.type==="Polygon" && geoArray[indexLayerB].geometry.type==="Polygon"){
             var newIntersect = turf.intersect(geoArray[indexLayerA], geoArray[indexLayerB]);
             geoArray[geoArray.length] = newIntersect;
 

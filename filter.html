@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Project - TBA4251</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==" crossorigin=""></script>
+    <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+
+    <style>
+        body, html {
+          height: 100%;
+          margin: 0;
+            padding: 0;
+        }
+
+        #mapid {
+            height: 95%;
+            width: 85%;
+            float: left;
+        }
+
+        .content {
+            text-align: center;
+            float: left;
+            height: 95%;
+            width: 15%;
+            background-color: #ccc;
+        }
+
+        /* Add a black background color to the top navigation */
+        .topnav {
+            background-color: #333;
+            overflow: hidden;
+            height: 5%;
+        }
+
+        /* Style the links inside the navigation bar */
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        /* Change the color of links on hover */
+        .topnav a:hover {
+          background-color: #ddd;
+          color: black;
+        }
+
+        /* Add a color to the active/current link */
+        .topnav a.active {
+          background-color: #4CAF50;
+          color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="topnav">
+        <a href="index.html">Start/Intro</a>
+        <a href="buffer.html">Buffer</a>
+        <a href="union.html">Union</a>
+        <a href="intersect.html">Intersect</a>
+        <a href="difference.html">Difference</a>
+        <a class="active">Filter</a>
+    </div>
+
+    <div id="mapid"></div>
+
+    <div class="content">
+        <p>INFO</p>
+
+        <div style="margin: 10px">
+            <p style="padding:0; margin:0; display: inline-block">Layer: </p>
+            <select id="selectLayer" onchange="propagateLayer()" style="width: 60%"></select><br>
+            <p style="padding:0; margin:0; display: inline-block">Property: </p>
+            <select id="selectProperty" onchange="propogateProperty()" style="width: 60%"></select><br>
+            <p style="padding:0; margin:0; display: inline-block">Operation: </p>
+            <select id="selectOperator" style="width: 60%"></select><br>
+            <p style="padding:0; margin:0; display: inline-block">Value: </p>
+            <select id="selectValue" style="width: 60%"></select><br>
+            <button onclick="filterFunction()" style="margin: 5px">Filter</button><br>
+        </div>
+    </div>
+
+
+    <script>
+
+    // initialize the map
+    var mymap = L.map('mapid', {zoomControl: false, attributionControl: false, zoomSnap: 0.5}).setView([51.505, -0.09], 13);
+
+    var geoArray = [];
+    var layerArray = [];
+
+     // load a tile layer
+    var baselayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox.streets',
+        accessToken: 'pk.eyJ1IjoidHJ1bHNlbGciLCJhIjoiY2pjd2ZkendyMWFlMzJxbnV1NG85M3R5dCJ9.MWVoCtm9_o9MYosQqVMK6w'
+    });
+    baselayer.addTo(mymap);
+
+    var base = L.tileLayer('', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18
+    });
+
+    var bases = {
+        "Base": baselayer,
+        "Blankt": base
+    };
+
+    var geoA = {
+        "type": "Feature",
+        "properties": {"keyTest": "valueTest"},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+            [
+                [-0.10866165161132812, 51.50607135001545],
+                [-0.11544227600097655, 51.49437004845741],
+                [-0.10162353515625, 51.48384165324227],
+                [-0.07424354553222656, 51.484696842043554],
+                [-0.06763458251953125, 51.49752274956565],
+                [-0.07656097412109375, 51.51493882813492],
+                [-0.10866165161132812, 51.50607135001545]
+          ]
+        ]
+      }
+    };
+    var layerA = L.geoJSON(geoA).addTo(mymap);
+    geoArray[geoArray.length] = geoA;
+    layerArray[layerArray.length] = layerA;
+
+    var geoB = {
+        "type": "Feature",
+        "properties": {"testKey": "testValue", "key2": "value222"},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+            [
+                [-0.13810157775879509, 51.515900258184224],
+                [-0.15046119689941406, 51.49196529933168],
+                [-0.12754440307617188, 51.494690672089675],
+                [-0.11750221252441408, 51.4864606182951],
+                [-0.09707450866699822, 51.50735350177636],
+                [-0.11878967285156854, 51.51574002125196],
+                [-0.13810157775879509, 51.515900258184224]
+             ]
+            ]
+        }
+    };
+    var layerB = L.geoJSON(geoB).addTo(mymap);
+    geoArray[geoArray.length] = geoB;
+    layerArray[layerArray.length] = layerB;
+
+    var geoC ={ "type": "FeatureCollection",
+        "features": [
+          { "type": "Feature",
+            "geometry": {"type": "Point", "coordinates": [-0.13810157775879509, 51.515900258184224]},
+            "properties": {"value": 2}
+          },
+          { "type": "Feature",
+            "geometry": {"type": "Point", "coordinates": [-0.15046119689941406, 51.49196529933168]},
+            "properties": {"value": 1, "newProperty": "Text!"}
+          },
+       ]
+    };
+    var layerC = L.geoJSON(geoC, {
+        onEachFeature: function (feature, layer) {
+            let popup = makePopupContentForFeature(feature);
+            layer.bindPopup(popup);
+        }
+    }).addTo(mymap);
+    geoArray[geoArray.length] = geoC;
+    layerArray[layerArray.length] = layerC;
+
+
+    var overlays = {
+        "Layer 1": layerA,
+        "Layer 2": layerB,
+        "Layer C": layerC
+    }
+
+     // Control for showing layers
+    var layerControl = L.control.layers(bases, overlays, {collapsed: false}).addTo(mymap);
+    L.control.scale({imperial: false, position: 'bottomright'}).addTo(mymap);
+    L.control.zoom({position: 'bottomright'}).addTo(mymap);
+
+
+    // Populate select-list with active layers
+    var selectLayer = document.getElementById("selectLayer"); // Gets the list
+    //var selectLayerB = document.getElementById("selectLayerB");
+    var overlaysArray = Object.getOwnPropertyNames(overlays); // Get the names/index of the layers, as per overlays-object. Use these as reference
+    for (i=0; i<overlaysArray.length; i++){
+        selectLayer.options[selectLayer.options.length] = new Option(overlaysArray[i], i);
+    }
+
+
+    var properties = [];
+    var values = [];
+    var legalStringOperators = ["=", "!="];
+    var legalNumericOperators = ["=", ">", ">=", "<", "<="];
+    var isAllValuesNumbers = true; //Initiates variable as boolean
+
+
+    propagateLayer();
+
+    function propagateLayer() {
+        let selectedLayer  = document.getElementById("selectLayer");
+        let indexOfLayer = selectedLayer[selectedLayer.selectedIndex].value;
+        let layer = geoArray[indexOfLayer];
+
+        // Checks what kinds of properties exist
+        if (layer.type === "Feature" && (!(Object.keys(layer.properties).length===0))){
+            properties = Object.keys(layer.properties);
+        } else if (layer.type === "FeatureCollection"){
+            let layerProps = [];
+            for (let f in layer.features){
+                let featureProps = Object.keys(layer.features[f].properties);
+                for (let p in featureProps){
+                    if (!(layerProps.includes(featureProps[p]))){
+                        layerProps[layerProps.length]=featureProps[p];
+                    }
+                }
+            }
+
+            properties = layerProps;
+        }
+
+        let selectProp = document.getElementById("selectProperty");
+        // Empties options for properties
+        for(let i = selectProp.options.length - 1 ; i >= 0 ; i--) {
+            selectProp.remove(i);
+        }
+        // fills options for properties
+        for (let p in properties){
+            selectProp.options[selectProp.options.length] = new Option(properties[p],p);
+        }
+
+        propogateProperty();
+    }
+
+    function propogateProperty() {
+        let selectedLayer = document.getElementById("selectLayer");
+        let indexOfLayer = selectedLayer.options[selectedLayer.selectedIndex].value;
+        let selectedProperty = document.getElementById("selectProperty");
+        let indexOfProperty = selectedProperty.options[selectedProperty.selectedIndex].value;
+
+        let layer = geoArray[indexOfLayer];
+        let property = properties[indexOfProperty];
+
+        values = [];
+
+        if (layer.type==="FeatureCollection"){
+            for (let f in layer.features){
+                let featureproperties = Object.keys(layer.features[f].properties);
+                if (featureproperties.includes(property)){
+                    values[values.length] = layer.features[f].properties[property];
+                }
+            }
+        } else if (layer.type==="Feature"){
+            let featureproperties = Object.keys(layer.properties);
+            if (featureproperties.includes(property)){
+                values[values.length] = layer.properties[property];
+            }
+        }
+
+
+        // Values
+        let selectVal = document.getElementById("selectValue");
+        // Empties options for values
+        for(let i = selectVal.options.length - 1 ; i >= 0 ; i--) {
+            selectVal.options.remove(i);
+        }
+        // fills options for values
+        for (let v in values){
+            selectVal.options[selectVal.options.length] = new Option(values[v],v);
+        }
+
+
+        // Operators
+        let selectOp = document.getElementById("selectOperator");
+        // Empties options for operators
+        for(let i = selectOp.options.length - 1 ; i >= 0 ; i--) {
+            selectOp.options.remove(i);
+        }
+        // Checks if all possible values are numbers, otherwise, at least 1 value is a string
+        isAllValuesNumbers = true;
+        for (let v in values){
+            // isNaN --> is not a number
+            if (isNaN(values[v])){
+                isAllValuesNumbers = false;
+            }
+        }
+        console.log(legalNumericOperators);
+        console.log(legalStringOperators);
+        if(isAllValuesNumbers){
+            // fills options for operators as numerical operators
+            for (let op in legalNumericOperators){
+                selectOp.options[selectOp.options.length] = new Option(legalNumericOperators[op],op);
+            }
+        } else if (!isAllValuesNumbers) {
+            // fills options for operators as string operators
+            for (let o in legalStringOperators){
+                selectOp.options[selectOp.options.length] = new Option(legalStringOperators[o],o);
+            }
+        }
+
+    }
+
+    function filterFunction() {
+
+    }
+
+    function intersectFunction(){
+        // Gets the selected layers
+        let eA = document.getElementById("selectLayerA");
+        let indexLayerA = eA.options[eA.selectedIndex].value;
+        let eB = document.getElementById("selectLayerB");
+        let indexLayerB = eB.options[eB.selectedIndex].value;
+
+        if (!(indexLayerB===indexLayerA) && geoArray[indexLayerA].geometry.type==="Polygon" && geoArray[indexLayerB].geometry.type==="Polygon"){
+            var newIntersect = turf.intersect(geoArray[indexLayerA], geoArray[indexLayerB]);
+            geoArray[geoArray.length] = newIntersect;
+
+            overlaysArray = Object.getOwnPropertyNames(overlays); // Update names of overlays
+            var newIntersectString = ""+overlaysArray[indexLayerA]+"_"+overlaysArray[indexLayerB]+"_intersect";
+
+            var newIntersectLayer = L.geoJSON(newIntersect).bindPopup("Layer: "+newIntersectString).addTo(mymap);
+            layerArray[layerArray.length] = newIntersectLayer;
+
+            layerControl.addOverlay(newIntersectLayer, newIntersectString);
+
+            overlays[newIntersectString] = newIntersectLayer;
+
+            // Updates lists
+            var newValue = selectLayerA.options.length;
+            selectLayerA.options[selectLayerA.options.length] = new Option(newIntersectString, newValue);
+            selectLayerB.options[selectLayerB.options.length] = new Option(newIntersectString, newValue);
+        }
+    }
+
+    // Makes a table of all properties for a feature
+    function makePopupContentForFeature(feature) {
+            let popupContent = '<table>';
+            for (var p in feature.properties) {
+                popupContent += '<tr><td>' + p + ':</td><td>'+ feature.properties[p] + '</td></tr>';
+            }
+            popupContent += '</table>';
+            return popupContent;
+    }
+
+    </script>
+
+</body>
+</html>
