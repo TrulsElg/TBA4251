@@ -186,11 +186,12 @@
             var newIntersect = turf.intersect(geoArray[indexLayerA], geoArray[indexLayerB]);
             geoArray[geoArray.length] = newIntersect;
 
-            var newIntersectLayer = L.geoJSON(newIntersect).addTo(mymap);
-            layerArray[layerArray.length] = newIntersectLayer;
-
             overlaysArray = Object.getOwnPropertyNames(overlays); // Update names of overlays
             var newIntersectString = ""+overlaysArray[indexLayerA]+"_"+overlaysArray[indexLayerB]+"_intersect";
+
+            var newIntersectLayer = L.geoJSON(newIntersect).bindPopup("Layer: "+newIntersectString).addTo(mymap);
+            layerArray[layerArray.length] = newIntersectLayer;
+
             layerControl.addOverlay(newIntersectLayer, newIntersectString);
 
             overlays[newIntersectString] = newIntersectLayer;

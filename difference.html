@@ -188,11 +188,12 @@
             let newDiff = turf.difference(geoArray[indexLayerA], geoArray[indexLayerB]);
             geoArray[geoArray.length] = newDiff;
 
-            let newDiffLayer = L.geoJSON(newDiff).addTo(mymap);
-            layerArray[layerArray.length] = newDiffLayer;
-
             overlaysArray = Object.getOwnPropertyNames(overlays); // Update names of overlays
             let newDiffString = ""+overlaysArray[indexLayerA]+"_"+overlaysArray[indexLayerB]+"_difference";
+
+            let newDiffLayer = L.geoJSON(newDiff).bindPopup("Layer: "+newDiffString).addTo(mymap);
+            layerArray[layerArray.length] = newDiffLayer;
+
             layerControl.addOverlay(newDiffLayer, newDiffString);
 
             overlays[newDiffString] = newDiffLayer;

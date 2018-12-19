@@ -179,8 +179,8 @@
 
         if (!(numberInput == "" || numberInput == null)) {
             var newBuffer = turf.buffer(overlays[strLayer].toGeoJSON(), (numberInput*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
-            var newBufferLayer = L.geoJSON(newBuffer).bindPopup('Area:'+(turf.area(newBuffer)/1000000)+" km^2").addTo(mymap);
-            var newBufferString = "" + strLayer +"_Buffer_"+numberInput;
+            var newBufferString = "" + strLayer +"_Buffer_"+numberInput+"km";
+            var newBufferLayer = L.geoJSON(newBuffer).bindPopup("Layer: "+newBufferString+'<br>Area:'+(turf.area(newBuffer)/1000000)+" km^2").addTo(mymap);
             layerControl.addOverlay(newBufferLayer, newBufferString);
 
 

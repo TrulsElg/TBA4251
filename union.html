@@ -188,11 +188,12 @@
             let newUnion = turf.union(geoArray[indexLayerA], geoArray[indexLayerB]);
             geoArray[geoArray.length] = newUnion;
 
-            let newUnionLayer = L.geoJSON(newUnion).addTo(mymap);
-            layerArray[layerArray.length] = newUnionLayer;
-
             overlaysArray = Object.getOwnPropertyNames(overlays); // Update names of overlays
             let newUnionString = ""+overlaysArray[indexLayerA]+"_"+overlaysArray[indexLayerB]+"_union";
+
+            let newUnionLayer = L.geoJSON(newUnion).bindPopup("Layer: "+newUnionString).addTo(mymap);
+            layerArray[layerArray.length] = newUnionLayer;
+
             layerControl.addOverlay(newUnionLayer, newUnionString);
 
             overlays[newUnionString] = newUnionLayer;
