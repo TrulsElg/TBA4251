@@ -65,9 +65,9 @@
     <div class="topnav">
         <a href="index.html">Start/Intro</a>
         <a href="buffer.html">Buffer</a>
-        <a class="active">Union</a>
+        <a href="union.html">Union</a>
         <a href="intersect.html">Intersect</a>
-        <a href="difference.html">Difference</a>
+        <a class="active">Difference</a>
     </div>
 
     <div id="mapid" ></div>
@@ -80,7 +80,7 @@
             <select id="selectLayerA" style="width: 60%"></select><br>
             <p style="padding:0; margin:0; display: inline-block">Layer B: </p>
             <select id="selectLayerB" style="width: 60%"></select><br>
-            <button onclick="unionFunction()" style="margin: 5px">Create union</button><br>
+            <button onclick="differenceFunction()" style="margin: 5px">Create difference</button><br>
         </div>
     </div>
 
@@ -177,7 +177,7 @@
         }
 
 
-        function unionFunction(){
+        function differenceFunction(){
         // Gets the selected layers
         let eA = document.getElementById("selectLayerA");
         let indexLayerA = eA.options[eA.selectedIndex].value;
@@ -185,22 +185,22 @@
         let indexLayerB = eB.options[eB.selectedIndex].value;
 
         if (!(indexLayerB==indexLayerA) && geoArray[indexLayerA].geometry.type=="Polygon" && geoArray[indexLayerB].geometry.type=="Polygon"){
-            let newUnion = turf.union(geoArray[indexLayerA], geoArray[indexLayerB]);
-            geoArray[geoArray.length] = newUnion;
+            let newDiff = turf.difference(geoArray[indexLayerA], geoArray[indexLayerB]);
+            geoArray[geoArray.length] = newDiff;
 
-            let newUnionLayer = L.geoJSON(newUnion).addTo(mymap);
-            layerArray[layerArray.length] = newUnionLayer;
+            let newDiffLayer = L.geoJSON(newDiff).addTo(mymap);
+            layerArray[layerArray.length] = newDiffLayer;
 
             overlaysArray = Object.getOwnPropertyNames(overlays); // Update names of overlays
-            let newUnionString = ""+overlaysArray[indexLayerA]+"_"+overlaysArray[indexLayerB]+"_union";
-            layerControl.addOverlay(newUnionLayer, newUnionString);
+            let newDiffString = ""+overlaysArray[indexLayerA]+"_"+overlaysArray[indexLayerB]+"_difference";
+            layerControl.addOverlay(newDiffLayer, newDiffString);
 
-            overlays[newUnionString] = newUnionLayer;
+            overlays[newDiffString] = newDiffLayer;
 
             // Updates lists
             let newValue = selectLayerA.options.length;
-            selectLayerA.options[selectLayerA.options.length] = new Option(newUnionString, newValue);
-            selectLayerB.options[selectLayerB.options.length] = new Option(newUnionString, newValue);
+            selectLayerA.options[selectLayerA.options.length] = new Option(newDiffString, newValue);
+            selectLayerB.options[selectLayerB.options.length] = new Option(newDiffString, newValue);
         }
 
     }
