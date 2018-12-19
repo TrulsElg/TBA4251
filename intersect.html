@@ -192,6 +192,8 @@
             var newIntersectString = ""+overlaysArray[indexLayerA]+"_"+overlaysArray[indexLayerB]+"_intersect";
             layerControl.addOverlay(newIntersectLayer, newIntersectString);
 
+            overlays[newIntersectString] = newIntersectLayer;
+
             // Updates lists
             var newValue = selectLayerA.options.length;
             selectLayerA.options[selectLayerA.options.length] = new Option(newIntersectString, newValue);
