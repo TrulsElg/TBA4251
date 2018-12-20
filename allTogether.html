@@ -66,26 +66,31 @@
         <a href="union.html">Union</a>
         <a href="intersect.html">Intersect</a>
         <a href="difference.html">Difference</a>
-        <a class="active">Filter</a>
-        <a href="allTogether.html">Free Roam</a>
+        <a href="filter.html">Filter</a>
+        <a class="active">Free Roam</a>
     </div>
 
     <div id="mapid"></div>
 
     <div class="content">
-        <p>INFO</p>
+        <div style="border-color: black; border-style: solid; margin-top: 5px">
+            <p>EXTRACT FEATURES</p>
 
-        <div style="margin: 10px">
-            <p style="padding:0; margin:0; display: inline-block">Layer: </p>
-            <select id="selectLayer" onchange="propagateLayer()" style="width: 60%"></select><br>
-            <p style="padding:0; margin:0; display: inline-block">Property: </p>
-            <select id="selectProperty" onchange="propogateProperty()" style="width: 60%"></select><br>
-            <p style="padding:0; margin:0; display: inline-block">Operation: </p>
-            <select id="selectOperator" style="width: 60%"></select><br>
-            <p style="padding:0; margin:0; display: inline-block">Value: </p>
-            <select id="selectValue" style="width: 60%"></select><br>
-            <button onclick="filterFunction()" style="margin: 5px">Filter</button><br>
+            <div style="margin: 10px">
+                <p style="padding:0; margin:0; display: inline-block">Layer: </p>
+                <select id="selectLayer" onchange="propagateLayer()" style="width: 60%"></select><br>
+                <p style="padding:0; margin:0; display: inline-block">Property: </p>
+                <select id="selectProperty" onchange="propogateProperty()" style="width: 60%"></select><br>
+                <p style="padding:0; margin:0; display: inline-block">Operation: </p>
+                <select id="selectOperator" style="width: 60%"></select><br>
+                <p style="padding:0; margin:0; display: inline-block">Value: </p>
+                <select id="selectValue" style="width: 60%"></select><br>
+                <button onclick="filterFunction()" style="margin: 5px">Filter</button><br>
+            </div>
         </div>
+
+
+
     </div>
 
 
