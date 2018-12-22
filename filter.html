@@ -497,7 +497,7 @@
     // Makes a table of all properties for a feature, used for popup text/content to make it easier to see what is what
     function makePopupContentForFeature(feature, layerStr) {
             let popupContent = '<table>';
-            popupContent += '<tr><td>' + "Layer name:" + ':</td><td>'+ layerStr + '</td></tr>'
+            popupContent += '<tr><td>' + "Layer name" + ':</td><td>'+ layerStr + '</td></tr>'
             for (var p in feature.properties) {
                 popupContent += '<tr><td>' + p + ':</td><td>'+ feature.properties[p] + '</td></tr>';
             }
