@@ -8,6 +8,10 @@
     <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==" crossorigin=""></script>
     <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
 
+    <!-- Self made javascript objects and functions contained in files -->
+    <script src="testPoints.js"></script>
+    <script src="functions.js"></script>
+
     <style>
         body, html {
           height: 100%;
@@ -160,22 +164,6 @@
     geoArray[geoArray.length] = geoB;
     layerArray[layerArray.length] = layerB;
 
-    var geoC ={ "type": "FeatureCollection",
-        "features": [
-          { "type": "Feature",
-            "geometry": {"type": "Point", "coordinates": [-0.13810157775879509, 51.515900258184224]},
-            "properties": {"value": 2, "newProperty": "Non text"}
-          },
-          { "type": "Feature",
-            "geometry": {"type": "Point", "coordinates": [-0.15046119689941406, 51.49196529933168]},
-            "properties": {"value": 1, "newProperty": "Text!"}
-          },
-            { "type": "Feature",
-            "geometry": {"type": "Point", "coordinates": [-0.12754440307617188, 51.494690672089675]},
-            "properties": {"value": 2, "newProperty": "Text!"}
-          },
-       ]
-    };
     var layerC = L.geoJSON(geoC, {
         onEachFeature: function (feature, layer) {
             let popup = makePopupContentForFeature(feature, "Layer C");
@@ -315,7 +303,7 @@
         }
 
     }
-
+/*
     function filterFunction() {
         // Get index of selected layer
         let selectedLayer = document.getElementById("selectLayer");
@@ -490,21 +478,8 @@
             selectLayer.options[selectLayer.options.length] = new Option(newFCString, selectLayer.options.length);
 
         }
-
-
     }
-
-    // Makes a table of all properties for a feature, used for popup text/content to make it easier to see what is what
-    function makePopupContentForFeature(feature, layerStr) {
-            let popupContent = '<table>';
-            popupContent += '<tr><td>' + "Layer name" + ':</td><td>'+ layerStr + '</td></tr>'
-            for (var p in feature.properties) {
-                popupContent += '<tr><td>' + p + ':</td><td>'+ feature.properties[p] + '</td></tr>';
-            }
-            popupContent += '</table>';
-            return popupContent;
-    }
-
+*/
     </script>
 
 </body>

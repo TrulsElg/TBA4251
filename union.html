@@ -8,6 +8,11 @@
     <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==" crossorigin=""></script>
     <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
 
+
+    <!-- Self made javascript objects and functions contained in files -->
+    <script src="testPoints.js"></script>
+    <script src="functions.js"></script>
+
     <style>
 
         body, html {
@@ -178,35 +183,6 @@
             selectLayerB.options[selectLayerB.options.length] = new Option(overlaysArray[i], i);
         }
 
-
-        function unionFunction(){
-        // Gets the selected layers
-        let eA = document.getElementById("selectLayerA");
-        let indexLayerA = eA.options[eA.selectedIndex].value;
-        let eB = document.getElementById("selectLayerB");
-        let indexLayerB = eB.options[eB.selectedIndex].value;
-
-        if (!(indexLayerB===indexLayerA) && geoArray[indexLayerA].geometry.type==="Polygon" && geoArray[indexLayerB].geometry.type==="Polygon"){
-            let newUnion = turf.union(geoArray[indexLayerA], geoArray[indexLayerB]);
-            geoArray[geoArray.length] = newUnion;
-
-            overlaysArray = Object.getOwnPropertyNames(overlays); // Update names of overlays
-            let newUnionString = ""+overlaysArray[indexLayerA]+"_"+overlaysArray[indexLayerB]+"_union";
-
-            let newUnionLayer = L.geoJSON(newUnion).bindPopup("Layer: "+newUnionString).addTo(mymap);
-            layerArray[layerArray.length] = newUnionLayer;
-
-            layerControl.addOverlay(newUnionLayer, newUnionString);
-
-            overlays[newUnionString] = newUnionLayer;
-
-            // Updates lists
-            let newValue = selectLayerA.options.length;
-            selectLayerA.options[selectLayerA.options.length] = new Option(newUnionString, newValue);
-            selectLayerB.options[selectLayerB.options.length] = new Option(newUnionString, newValue);
-        }
-
-    }
 
     </script>
 
