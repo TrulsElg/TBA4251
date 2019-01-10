@@ -1,28 +1,28 @@
-function bufferFunction(){
+    function bufferFunction(){
         // Gets the selected layer
         let e = document.getElementById("selectBufferLayer");
-        let strLayer = e.options[e.selectedIndex].value;
+        let indexOfLayer = e.options[e.selectedIndex].value;
+        let strLayer = overlaysStringArray[e.options[e.selectedIndex].value];
         let numberInput = document.getElementById("bufferLength").value;
 
         if (!(numberInput === "" || numberInput == null)) {
-            let newBuffer = turf.buffer(overlays[strLayer].toGeoJSON(), (numberInput*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
+            let newBuffer = turf.buffer(geoArray[indexOfLayer], (numberInput*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
+            geoArray[geoArray.length] = newBuffer;
             let newBufferString = "" + strLayer +"_Buffer_"+numberInput+"km";
 
             if (newBuffer.type === "Feature") {
                 //Update(or set) value of area
+                newBuffer.properties = {};
                 newBuffer.properties["area (km^2)"] = turf.area(newBuffer)/1000000;
                 let newBufferLayer = L.geoJSON(newBuffer).bindPopup(makePopupContentForFeature(newBuffer, newBufferString)).addTo(mymap);
+                layerArray[layerArray.length] = newBufferLayer;
                 layerControl.addOverlay(newBufferLayer, newBufferString);
 
-                overlays[newBufferString] = newBufferLayer;
-                selectLayer.options[selectLayer.options.length] = new Option(newBufferString, newBufferString);
-
             } else if (newBuffer.type === "FeatureCollection") {
-                //alert(newBufferLayer.features.length);
-                //let numberOfFeateres = newBufferLayer.features.length
                 let newBufferLayer = L.geoJSON(newBuffer, {
                     onEachFeature: function (feature, layer) {
                         // Set area
+                        feature.properties = {}; //Removes any properties that may have carried over
                         feature.properties["area (km^2)"] = turf.area(feature)/1000000;
 
                         // Bind popup with values of properties
@@ -30,16 +30,25 @@ function bufferFunction(){
                         layer.bindPopup(content);
                     }
                 }).addTo(mymap);
+                layerArray[layerArray.length] = newBufferLayer;
                 layerControl.addOverlay(newBufferLayer, newBufferString);
 
-                // Updates layer list
+                // Updates layer lists
                 overlays[newBufferString] = newBufferLayer;
-                // Look to replace this part with function
-                selectLayer.options[selectLayer.options.length] = new Option(newBufferString, newBufferString);
+                overlaysStringArray = Object.getOwnPropertyNames(overlays);
+
+
+            }
+
+
+            let layerSelectors = document.getElementsByClassName("layerSelect");
+            for (let i = 0; i<layerSelectors.length;i++){
+                console.log(layerSelectors[i].options);
+                layerSelectors[i].options[layerSelectors[i].options.length] = new Option(newBufferString,layerSelectors[i].options.length);
             }
 
         } else {
-            alert("No value for radius length selected")
+            alert("No value for radius length selected");
         }
     }
 
@@ -228,7 +237,12 @@ function bufferFunction(){
             overlays[newFCString] = newFCLayer; //Adds to list(actually javascript object) of overlays added to the control
 
             // Adds extracted features to dropdown list of layers
-            selectedLayer.options[selectedLayer.options.length] = new Option(newFCString, selectedLayer.options.length);
+            //selectedLayer.options[selectedLayer.options.length] = new Option(newFCString, selectedLayer.options.length);
+            let layerSelectors = document.getElementsByClassName("layerSelect");
+            for (let i = 0; i<layerSelectors.length;i++){
+                console.log(layerSelectors[i].options);
+                layerSelectors[i].options[layerSelectors[i].options.length] = new Option(newFCString,layerSelectors[i].options.length);
+            }
 
         }
     } // End of filterFunction
@@ -426,15 +440,4 @@ function bufferFunction(){
             }
         }
 
-    }
-
-    // Makes a table of all properties for a feature, used for popup text/content to make it easier to see what it contains
-    function makePopupContentForFeature(feature, layerStr) {
-            let popupContent = '<table>';
-            popupContent += '<tr><td>' + "Layer name:" + ':</td><td>'+ layerStr + '</td></tr>'
-            for (var p in feature.properties) {
-                popupContent += '<tr><td>' + p + ':</td><td>'+ feature.properties[p] + '</td></tr>';
-            }
-            popupContent += '</table>';
-            return popupContent;
     }

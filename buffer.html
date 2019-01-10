@@ -101,6 +101,9 @@
     // initialize the map
     var mymap = L.map('mapid', {zoomControl: false, attributionControl: false, zoomSnap: 0.5}).setView([51.505, -0.09], 13);
 
+    var geoArray = [];
+    var layerArray = []
+
      // load a tile layer
     var baselayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -115,9 +118,7 @@
         maxZoom: 18
     });
 
-    var marker = L.marker([51.5, -0.09]).bindPopup('Text').addTo(mymap);
-    var buffer = turf.buffer(marker.toGeoJSON(), (2*1.1479353798440702759084213925493208038064486526513132205531901412468107864020422411741033562379781929643901679238), {units: 'kilometers', steps: 1024});
-    var bufferLayer = L.geoJSON(buffer).bindPopup('Area:'+(turf.area(buffer)/1000000)+" km^2").addTo(mymap);
+
 
     var geojsonFeature = {
         "type": "Feature",
@@ -131,6 +132,14 @@
             "coordinates": [-0.1, 51.51]
         }
     };
+    geoArray[geoArray.length] = geojsonFeature;
+    var myLayer = L.geoJSON(geojsonFeature, {
+        onEachFeature: function (feature, layer) {
+            content = makePopupContentForFeature(feature, "geojsonFeature");
+            layer.bindPopup(content);
+        }
+    }).addTo(mymap);
+    layerArray[layerArray.length] = myLayer;
 
     var feature = {
         "type": "Feature",
@@ -223,12 +232,10 @@
     };
     var featureLayer = L.geoJSON(feature).bindPopup('Area:'+(turf.area(feature)/1000000)+" km^2").addTo(mymap);
 
-    var myLayer = L.geoJSON(geojsonFeature, {
-        onEachFeature: function (feature, layer) {
-            content = "Name: " + feature.properties.name + "<br>Amenity: " + feature.properties.amenity + "<br>Content: " + feature.properties.popupContent;
-            layer.bindPopup(content);
-        }
-    }).addTo(mymap);
+    geoArray[geoArray.length] = feature;
+    layerArray[layerArray.length] = featureLayer;
+
+
 
     var testLayer = L.geoJSON(geoC,{
         onEachFeature: function (feature, layer) {
@@ -236,6 +243,8 @@
             layer.bindPopup(content);
         }
     }).addTo(mymap);
+    geoArray[geoArray.length] = geoC;
+    layerArray[layerArray.length] = testLayer;
 
     var bases = {
         "Base": baselayer,
@@ -243,9 +252,7 @@
     };
 
     var overlays = {
-        "Point": marker,
         "GeoJSON-ting": myLayer,
-        "Buffer layer": bufferLayer,
         "Funky": featureLayer,
         "From js-file": testLayer
     };
@@ -257,10 +264,10 @@
 
 
     // Populate select-list with active layers
-    var selectLayer = document.getElementById("selectBufferLayer"); // Gets the list
-    var layerArray = Object.getOwnPropertyNames(overlays); // Get the names of the layers, as per overlays-object. Use these as reference
-    for (i=0; i<layerArray.length; i++){
-        selectLayer.options[selectLayer.options.length] = new Option(layerArray[i], layerArray[i]);
+    var selectBufferLayer = document.getElementById("selectBufferLayer"); // Gets the list
+    var overlaysStringArray = Object.getOwnPropertyNames(overlays); // Get the names of the layers, as per overlays-object. Use these as reference
+    for (i=0; i<overlaysStringArray.length; i++){
+        selectBufferLayer.options[selectBufferLayer.options.length] = new Option(overlaysStringArray[i], i);
     }
 
     </script>

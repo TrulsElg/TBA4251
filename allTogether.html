@@ -78,11 +78,23 @@
 
     <div class="content">
         <div style="border-color: black; border-style: solid; margin-top: 5px">
+            <p>BUFFER</p>
+
+            <div style="margin: 10px">
+                <p style="padding:0; margin:0; display: inline-block">Layer: </p>
+                <select id="selectBufferLayer" class="layerSelect" style="width: 60%"></select><br>
+                <p style="padding:0; margin:0; display: inline-block">Buffer length: </p>
+                <input id="bufferLength" style="width: 40%" type="number" min="0" step="0.0001" placeholder="Kilometer(s)"><br>
+                <button onclick="bufferFunction()" style="margin: 5px">Create buffer</button><br>
+            </div>
+        </div>
+
+        <div style="border-color: black; border-style: solid; margin-top: 5px">
             <p>EXTRACT FEATURES</p>
 
             <div style="margin: 10px">
                 <p style="padding:0; margin:0; display: inline-block">Layer: </p>
-                <select id="selectFilterLayer" onchange="propagateLayer()" style="width: 60%"></select><br>
+                <select id="selectFilterLayer" class="layerSelect" onchange="propagateLayer()" style="width: 60%"></select><br>
                 <p style="padding:0; margin:0; display: inline-block">Property: </p>
                 <select id="selectProperty" onchange="propogateProperty()" style="width: 60%"></select><br>
                 <p style="padding:0; margin:0; display: inline-block">Operation: </p>
@@ -192,13 +204,15 @@
 
 
     // Populate select-list with active layers
-    var selectLayer = document.getElementById("selectFilterLayer"); // Gets the list
+    var selectedBufferLayer = document.getElementById("selectBufferLayer");
+    var selectFilterLayer = document.getElementById("selectFilterLayer"); // Gets the dropdown list, filter
     var overlaysStringArray = Object.getOwnPropertyNames(overlays); // Get the names/index of the layers, as per overlays-object. Use these as reference
     for (i=0; i<overlaysStringArray.length; i++){
-        selectLayer.options[selectLayer.options.length] = new Option(overlaysStringArray[i], i);
+        selectedBufferLayer.options[selectedBufferLayer.options.length] = new Option(overlaysStringArray[i], i);
+        selectFilterLayer.options[selectFilterLayer.options.length] = new Option(overlaysStringArray[i], i);
     }
 
-
+    //Used for filter-function
     var properties = [];
     var values = [];
     var legalStringOperators = ["=", "!="];
