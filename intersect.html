@@ -82,9 +82,9 @@
 
         <div style="margin: 10px">
             <p style="padding:0; margin:0; display: inline-block">Layer A: </p>
-            <select id="selectLayerA" style="width: 60%"></select><br>
+            <select id="selectIntersectLayerA" style="width: 60%"></select><br>
             <p style="padding:0; margin:0; display: inline-block">Layer B: </p>
-            <select id="selectLayerB" style="width: 60%"></select><br>
+            <select id="selectIntersectLayerB" style="width: 60%"></select><br>
             <button onclick="intersectFunction()" style="margin: 5px">Create intersect</button><br>
         </div>
     </div>
@@ -174,8 +174,8 @@
 
 
     // Populate select-list with active layers
-    var selectLayerA = document.getElementById("selectLayerA"); // Gets the list
-    var selectLayerB = document.getElementById("selectLayerB");
+    var selectLayerA = document.getElementById("selectIntersectLayerA"); // Gets the list
+    var selectLayerB = document.getElementById("selectIntersectLayerB");
     var overlaysArray = Object.getOwnPropertyNames(overlays); // Get the names/index of the layers, as per overlays-object. Use these as reference
     for (i=0; i<overlaysArray.length; i++){
         selectLayerA.options[selectLayerA.options.length] = new Option(overlaysArray[i], i);

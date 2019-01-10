@@ -84,9 +84,9 @@
 
         <div style="margin: 10px">
             <p style="padding:0; margin:0; display: inline-block">Layer A: </p>
-            <select id="selectLayerA" style="width: 60%"></select><br>
+            <select id="selectDifferenceLayerA" style="width: 60%"></select><br>
             <p style="padding:0; margin:0; display: inline-block">Layer B: </p>
-            <select id="selectLayerB" style="width: 60%"></select><br>
+            <select id="selectDifferenceLayerB" style="width: 60%"></select><br>
             <button onclick="differenceFunction()" style="margin: 5px">Create difference</button><br>
         </div>
     </div>
@@ -175,8 +175,8 @@
 
 
         // Populate select-list with active layers
-        var selectLayerA = document.getElementById("selectLayerA"); // Gets the list
-        var selectLayerB = document.getElementById("selectLayerB");
+        var selectLayerA = document.getElementById("selectDifferenceLayerA"); // Gets the list
+        var selectLayerB = document.getElementById("selectDifferenceLayerB");
         var overlaysArray = Object.getOwnPropertyNames(overlays); // Get the names/index of the layers, as per overlays-object. Use these as reference
         for (let i=0; i<overlaysArray.length; i++){
             selectLayerA.options[selectLayerA.options.length] = new Option(overlaysArray[i], i);

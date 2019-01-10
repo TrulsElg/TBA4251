@@ -59,7 +59,7 @@ function bufferFunction(){
     // Function for filtering out certain parts of a layer
     function filterFunction() {
         // Get index of selected layer
-        let selectedLayer = document.getElementById("selectLayer");
+        let selectedLayer = document.getElementById("selectFilterLayer");
         let indexOfLayer = selectedLayer.options[selectedLayer.selectedIndex].value;
         // Gets index of selected property type
         let selectedProperty = document.getElementById("selectProperty");
@@ -227,7 +227,8 @@ function bufferFunction(){
             layerControl.addOverlay(newFCLayer, newFCString); //Adds to the overlay control
             overlays[newFCString] = newFCLayer; //Adds to list(actually javascript object) of overlays added to the control
 
-            selectLayer.options[selectLayer.options.length] = new Option(newFCString, selectLayer.options.length);
+            // Adds extracted features to dropdown list of layers
+            selectedLayer.options[selectedLayer.options.length] = new Option(newFCString, selectedLayer.options.length);
 
         }
     } // End of filterFunction
@@ -237,9 +238,9 @@ function bufferFunction(){
     // Function for creating a union between 2 layers (must be polygons)
     function unionFunction(){
             // Gets the selected layers
-            let eA = document.getElementById("selectLayerA");
+            let eA = document.getElementById("selectUnionLayerA");
             let indexLayerA = eA.options[eA.selectedIndex].value;
-            let eB = document.getElementById("selectLayerB");
+            let eB = document.getElementById("selectUnionLayerB");
             let indexLayerB = eB.options[eB.selectedIndex].value;
 
             if (!(indexLayerB===indexLayerA) && geoArray[indexLayerA].geometry.type==="Polygon" && geoArray[indexLayerB].geometry.type==="Polygon"){
@@ -268,9 +269,9 @@ function bufferFunction(){
     // Function for intersection between 2 layer (2 polygons)
     function intersectFunction(){
         // Gets the selected layers
-        var eA = document.getElementById("selectLayerA");
+        var eA = document.getElementById("selectIntersectLayerA");
         var indexLayerA = eA.options[eA.selectedIndex].value;
-        var eB = document.getElementById("selectLayerB");
+        var eB = document.getElementById("selectIntersectLayerB");
         var indexLayerB = eB.options[eB.selectedIndex].value;
 
         if (!(indexLayerB===indexLayerA) && geoArray[indexLayerA].geometry.type==="Polygon" && geoArray[indexLayerB].geometry.type==="Polygon"){
@@ -299,9 +300,9 @@ function bufferFunction(){
     // Function for difference between 2 layers (polygon or multipolygon)
     function differenceFunction(){
         // Gets the selected layers
-        let eA = document.getElementById("selectLayerA");
+        let eA = document.getElementById("selectDifferenceLayerA");
         let indexLayerA = eA.options[eA.selectedIndex].value;
-        let eB = document.getElementById("selectLayerB");
+        let eB = document.getElementById("selectDifferenceLayerB");
         let indexLayerB = eB.options[eB.selectedIndex].value;
 
         if (!(indexLayerB==indexLayerA) && geoArray[indexLayerA].geometry.type=="Polygon" && geoArray[indexLayerB].geometry.type=="Polygon"){
@@ -324,3 +325,116 @@ function bufferFunction(){
             selectLayerB.options[selectLayerB.options.length] = new Option(newDiffString, newValue);
         }
     } // End, differenceFunction
+
+
+    function propagateLayer() {
+        let selectedLayer  = document.getElementById("selectFilterLayer");
+        let indexOfLayer = selectedLayer[selectedLayer.selectedIndex].value;
+        let layer = geoArray[indexOfLayer];
+
+        // Checks what kinds of properties exist
+        if (layer.type === "Feature" && (!(Object.keys(layer.properties).length===0))){
+            properties = Object.keys(layer.properties);
+        } else if (layer.type === "FeatureCollection"){
+            let layerProps = [];
+            for (let f in layer.features){
+                let featureProps = Object.keys(layer.features[f].properties);
+                for (let p in featureProps){
+                    if (!(layerProps.includes(featureProps[p]))){
+                        layerProps[layerProps.length]=featureProps[p];
+                    }
+                }
+            }
+            // Updates the current properties for the layer currently selected
+            properties = layerProps;
+        }
+
+        let selectProp = document.getElementById("selectProperty");
+        // Empties options for properties
+        for(let i = selectProp.options.length - 1 ; i >= 0 ; i--) {
+            selectProp.remove(i);
+        }
+        // fills options for properties
+        for (let p in properties){
+            selectProp.options[selectProp.options.length] = new Option(properties[p],p);
+        }
+
+        propogateProperty();
+    }
+
+    function propogateProperty() {
+        let selectedLayer = document.getElementById("selectFilterLayer");
+        let indexOfLayer = selectedLayer.options[selectedLayer.selectedIndex].value;
+        let selectedProperty = document.getElementById("selectProperty");
+        let indexOfProperty = selectedProperty.options[selectedProperty.selectedIndex].value;
+
+        let layer = geoArray[indexOfLayer];
+        let property = properties[indexOfProperty];
+
+        values = [];
+        // Resets values array and fills it with the relevant options
+        if (layer.type==="FeatureCollection"){
+            for (let f in layer.features){
+                let featureproperties = Object.keys(layer.features[f].properties);
+                if (featureproperties.includes(property) && (!(values.includes(layer.features[f].properties[property])))){
+                    values[values.length] = layer.features[f].properties[property];
+                }
+            }
+        } else if (layer.type==="Feature"){
+            let featureproperties = Object.keys(layer.properties);
+            if (featureproperties.includes(property) && (!(values.includes(layer.properties[property])))){
+                values[values.length] = layer.properties[property];
+            }
+        }
+
+
+        // Values
+        let selectVal = document.getElementById("selectValue");
+        // Empties options for values
+        for(let i = selectVal.options.length - 1 ; i >= 0 ; i--) {
+            selectVal.options.remove(i);
+        }
+        // fills options for values
+        for (let v in values){
+            selectVal.options[selectVal.options.length] = new Option(values[v],v);
+        }
+
+
+        // Operators
+        let selectOp = document.getElementById("selectOperator");
+        // Empties options for operators
+        for(let i = selectOp.options.length - 1 ; i >= 0 ; i--) {
+            selectOp.options.remove(i);
+        }
+        // Checks if all possible values are numbers, otherwise, at least 1 value is a string
+        isAllValuesNumbers = true;
+        for (let v in values){
+            // isNaN --> is not a number
+            if (isNaN(values[v])){
+                isAllValuesNumbers = false;
+            }
+        }
+        if(isAllValuesNumbers){
+            // fills options for operators as numerical operators
+            for (let op in legalNumericOperators){
+                selectOp.options[selectOp.options.length] = new Option(legalNumericOperators[op],op);
+            }
+        } else if (!isAllValuesNumbers) {
+            // fills options for operators as string operators
+            for (let o in legalStringOperators){
+                selectOp.options[selectOp.options.length] = new Option(legalStringOperators[o],o);
+            }
+        }
+
+    }
+
+    // Makes a table of all properties for a feature, used for popup text/content to make it easier to see what it contains
+    function makePopupContentForFeature(feature, layerStr) {
+            let popupContent = '<table>';
+            popupContent += '<tr><td>' + "Layer name:" + ':</td><td>'+ layerStr + '</td></tr>'
+            for (var p in feature.properties) {
+                popupContent += '<tr><td>' + p + ':</td><td>'+ feature.properties[p] + '</td></tr>';
+            }
+            popupContent += '</table>';
+            return popupContent;
+    }
